@@ -1,0 +1,35 @@
+{
+  "name": "Outbound Dialing Server",
+  "description": "An application that serves a websocket connection to facilitate outbound call orchestration.  The websocket allows for posting of updates directly back to the front end client that made the call.",
+  "repository": "https://github.com/jhunter-twilio/outbound-dialing-backend.git",
+  "logo": "https://node-js-sample.herokuapp.com/node.png",
+  "keywords": ["node", "express", "twilio", "outbound", "dialing"],
+  "addons": [],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "env": {
+    "TWILIO_ACCOUNT_SID": {
+      "description": "Twilio Console Project Account Sid",
+      "value": "CHANGEME",
+      "required": true
+    },
+    "TWILIO_AUTH_TOKEN": {
+      "description": "Twilio Console Project Auth Token",
+      "value": "CHANGEME",
+      "required": true
+    },
+    "TWILIO_OUTBOUND_WORKFLOW_SID": {
+      "description": "TaskRouter workflow Sid dedicated to outbound calling",
+      "value": "CHANGEME",
+      "required": true
+    },
+    "EXTERNAL_HOST": {
+      "description": "The hostname in the form \"https://hostname\" of this service.  Use to tell Twilio where to send call status updates for each call made from this system.",
+      "value": "CHANGEME",
+      "required": true
+    }
+  }
+}
