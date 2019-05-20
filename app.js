@@ -7,6 +7,7 @@ var logger = require("morgan");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var callStatusCallbackHandler = require("./routes/callStatusCallbackHandler");
+var callHandlerTwiml = require("./routes/callHandlerTwiml");
 
 var tools = require("./common/tools");
 
@@ -30,6 +31,7 @@ console.info("Backend: " + process.env.EXTERNAL_HOST);
 
 app.set("wss", wss);
 app.set("callWebSocketMapping", callWebSocketMapping);
+app.set("twilioClient", twilioClient);
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -44,6 +46,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/callStatusCallbackHandler", callStatusCallbackHandler);
+app.use("/callHandlerTwiml", callHandlerTwiml);
 
 //added for establishing websocket
 app.use("/websocket", function(req, res, next) {
@@ -69,9 +72,9 @@ wss.on("connection", function connection(webSocketClient) {
         twilioClient.calls
           .create({
             url: encodeURI(
-              // "https://handler.twilio.com/twiml/EH31c0f2c9855a1a4467dd8c1a0e0606fb?workerContactUri=" +
-              //   data.workerContactUri
-              "https://handler.twilio.com/twiml/EH8dd4ef28f995ae566b11b8202937df64"
+              `${
+                process.env.EXTERNAL_HOST
+              }/callHandlerTwiml?workerContactUri=` + data.workerContactUri
             ),
             to: data.to,
             from: data.from,
@@ -82,9 +85,10 @@ wss.on("connection", function connection(webSocketClient) {
             statusCallbackEvent: ["ringing", "answered", "completed"]
           })
           .then(call => {
-            console.debug("\tcall created");
-            console.debug("\t\tcall sid:", call.sid);
-            console.debug("\t\tcall status:", call.status.toString());
+            console.debug("\tcall created: ", call.sid);
+            console.debug("\t\tto:\t", call.to);
+            console.debug("\t\tfrom:\t", call.from);
+            console.debug("\t\tstatus:\t", call.status.toString());
 
             var response = JSON.stringify({
               callSid: call.sid,
