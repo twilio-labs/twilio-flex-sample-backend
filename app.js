@@ -67,8 +67,12 @@ wss.on("connection", function connection(webSocketClient) {
     try {
       data = JSON.parse(data);
 
-      if (data.to && data.from && data.workerContactUri) {
-        console.debug("event received for creating call");
+      if (
+        data.method === "call" &&
+        data.to &&
+        data.from &&
+        data.workerContactUri
+      ) {
         twilioClient.calls
           .create({
             url: encodeURI(
@@ -99,6 +103,24 @@ wss.on("connection", function connection(webSocketClient) {
 
             //send call ID and status back to originating client
             webSocketClient.send(response);
+          })
+          .catch(error => {
+            console.error("\tcall creation failed");
+            console.error("\tERROR: ", error);
+          });
+      } else if (data.method === "hangup" && data.callSid) {
+        twilioClient
+          .calls(data.callSid)
+          .update({ status: "completed" })
+          .then(call => {
+            console.debug("\tcall terminated: ", call.sid);
+            console.debug("\t\tto:\t", call.to);
+            console.debug("\t\tfrom:\t", call.from);
+            console.debug("\t\tstatus:\t", call.status.toString());
+          })
+          .catch(error => {
+            console.error("\tcall failed to terminate: ", data.callSid);
+            console.error("\tERROR: ", error);
           });
       } else {
         var response = "Unrecognized payload";
