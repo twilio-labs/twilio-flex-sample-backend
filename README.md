@@ -48,10 +48,10 @@ You can now setup the server, you can either deploy to heroku (which is free, yo
 3. start server using ```TWILIO_OUTBOUND_WORKFLOW_SID=<WORKFLOWSID> TWILIO_ACCOUNT_SID=<ACCOUNTSID> TWILIO_AUTH_TOKEN=<AUTHTOKEN> EXTERNAL_HOST=https://<NGROK-ENDPOINT> DEBUG=outbound-dialing-backend:* npm start```
 
 # change log
+v1.1 - updated websocket endpoint to reflect its dedicated to outbound calling
 
 v1.0 - initial release
 
 # TODOs
 
-1. change websocket endpoint to something more descriptive for outbound calls
-2. consolidate backend server with other plugin solutions that require event push to client from backend.  (e.g. real time dashboard)
+1. consolidate backend server with other plugin solutions that require event push to client from backend.  (e.g. real time dashboard)
