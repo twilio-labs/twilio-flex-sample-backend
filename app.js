@@ -49,9 +49,9 @@ app.use("/callStatusCallbackHandler", callStatusCallbackHandler);
 app.use("/callHandlerTwiml", callHandlerTwiml);
 
 //added for establishing websocket
-app.use("/websocket", function(req, res, next) {
+app.use("/outboundDialWebsocket", function(req, res, next) {
   res.websocket(function(webSocketClient) {
-    console.debug("New websocket connection created");
+    console.debug("New outboundDialWebsocket connection created");
     webSocketClient.send("new connection established");
   });
 });
