@@ -4,6 +4,9 @@
  * Module dependencies.
  */
 
+const dotenv = require("dotenv");
+dotenv.config();
+
 var App = require("../app");
 var app = App.app;
 var wss = App.wss;
