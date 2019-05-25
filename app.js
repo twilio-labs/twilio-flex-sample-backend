@@ -76,15 +76,17 @@ wss.on("connection", function connection(webSocketClient) {
         twilioClient.calls
           .create({
             url: encodeURI(
-              `${
-                process.env.EXTERNAL_HOST
-              }/callHandlerTwiml?workerContactUri=` + data.workerContactUri
+              "https://" +
+                process.env.EXTERNAL_HOST +
+                "/callHandlerTwiml?workerContactUri=" +
+                data.workerContactUri
             ),
             to: data.to,
             from: data.from,
-            statusCallback: `${
-              process.env.EXTERNAL_HOST
-            }/callStatusCallbackHandler`,
+            statusCallback:
+              "https://" +
+              process.env.EXTERNAL_HOST +
+              "/callStatusCallbackHandler",
             // do the statusCallback for the above URL for the events below
             statusCallbackEvent: ["ringing", "answered", "completed"]
           })
@@ -95,6 +97,7 @@ wss.on("connection", function connection(webSocketClient) {
             console.debug("\t\tstatus:\t", call.status.toString());
 
             var response = JSON.stringify({
+              messageType: "callUpdate",
               callSid: call.sid,
               callStatus: call.status.toString()
             });
@@ -107,6 +110,9 @@ wss.on("connection", function connection(webSocketClient) {
           .catch(error => {
             console.error("\tcall creation failed");
             console.error("\tERROR: ", error);
+            webSocketClient.send(
+              JSON.stringify({ messageType: "error", message: error.message })
+            );
           });
       } else if (data.method === "hangup" && data.callSid) {
         twilioClient
@@ -121,16 +127,18 @@ wss.on("connection", function connection(webSocketClient) {
           .catch(error => {
             console.error("\tcall failed to terminate: ", data.callSid);
             console.error("\tERROR: ", error);
+            webSocketClient.send(
+              JSON.stringify({ messageType: "error", message: error.message })
+            );
           });
       } else {
-        var response = "Unrecognized payload";
-        console.warn("Unrecognized payload:");
-        console.warn("\t", data);
+        var response = "Unrecognized payload: " + data;
+        console.warn(response);
         webSocketClient.send(response);
       }
     } catch (e) {
       // if not an object, echo back to originating client
-      webSocketClient.send(data);
+      webSocketClient.send("echo: " + data);
     }
   });
 });
