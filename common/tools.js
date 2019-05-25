@@ -4,10 +4,24 @@ function setCORSHeaders(res) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 }
 
-function noop() {}
+function setupHeartbeatMonitor(name, websocketServer, timeout) {
+  setInterval(function ping() {
+    console.debug(
+      name + " heartbeat, active clients: " + websocketServer.clients.size
+    );
+    websocketServer.clients.forEach(function each(webSocketClient) {
+      if (webSocketClient.isAlive === false) {
+        console.warn(
+          "Possible network issue: webSocketClient timed out after 30 seconds, terminating"
+        );
 
-function heartbeat() {
-  this.isAlive = true;
+        return webSocketClient.terminate();
+      }
+
+      webSocketClient.isAlive = false;
+      webSocketClient.ping(() => {});
+    });
+  }, timeout);
 }
 
-module.exports = { setCORSHeaders, noop, heartbeat };
+module.exports = { setCORSHeaders, setupHeartbeatMonitor };

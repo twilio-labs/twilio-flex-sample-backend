@@ -4,34 +4,23 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 
+// add new routes
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var callStatusCallbackHandler = require("./routes/callStatusCallbackHandler");
 var callHandlerTwiml = require("./routes/callHandlerTwiml");
 
+// add websocket handlers
 var tools = require("./common/tools");
+var ws = require("ws");
 
+// init twilio client
 const twilioClient = require("twilio")(
   process.env.TWILIO_ACCOUNT_SID,
   process.env.TWILIO_AUTH_TOKEN
 );
 
 var app = express();
-
-//for websocket management
-var ws = require("ws");
-var wss = new ws.Server({ noServer: true });
-var callWebSocketMapping = new Map();
-
-console.info("AccountSid: " + process.env.TWILIO_ACCOUNT_SID);
-console.info(
-  "Auth Token: " + process.env.TWILIO_AUTH_TOKEN.slice(0, 5) + "..."
-);
-console.info("Backend: " + process.env.EXTERNAL_HOST);
-
-app.set("wss", wss);
-app.set("callWebSocketMapping", callWebSocketMapping);
-app.set("twilioClient", twilioClient);
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -43,12 +32,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+// map traditional routes
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/callStatusCallbackHandler", callStatusCallbackHandler);
 app.use("/callHandlerTwiml", callHandlerTwiml);
 
-//added for establishing websocket
+//map webSocket endpoints to upgrade connecion to websocket
 app.use("/outboundDialWebsocket", function(req, res, next) {
   res.websocket(function(webSocketClient) {
     console.debug("New outboundDialWebsocket connection created");
@@ -56,109 +46,42 @@ app.use("/outboundDialWebsocket", function(req, res, next) {
   });
 });
 
+/**
+ *  Outbound dialing websocket
+ *
+ */
+
+// init websocket server dedicated to outbound dialing
+var outboundDialingWSS = new ws.Server({ noServer: true });
+var outboundWSSHandler = require("./websockets/outboundDialWebSocket/eventManager");
+var callWebSocketMapping = new Map();
+
 // setup message echo to originating client
-wss.on("connection", function connection(webSocketClient) {
-  // setup ping response
-  webSocketClient.isAlive = true;
-  webSocketClient.on("pong", tools.heartbeat);
+outboundDialingWSS.on("connection", webSocketClient =>
+  outboundWSSHandler.handleConnection(
+    webSocketClient,
+    twilioClient,
+    callWebSocketMapping
+  )
+);
 
-  // Create handler for events coming in
-  webSocketClient.on("message", function handleIncomingMessage(data) {
-    try {
-      data = JSON.parse(data);
+tools.setupHeartbeatMonitor("outboundDialingWSS", outboundDialingWSS, 30000);
 
-      if (
-        data.method === "call" &&
-        data.to &&
-        data.from &&
-        data.workerContactUri
-      ) {
-        twilioClient.calls
-          .create({
-            url: encodeURI(
-              "https://" +
-                process.env.EXTERNAL_HOST +
-                "/callHandlerTwiml?workerContactUri=" +
-                data.workerContactUri
-            ),
-            to: data.to,
-            from: data.from,
-            statusCallback:
-              "https://" +
-              process.env.EXTERNAL_HOST +
-              "/callStatusCallbackHandler",
-            // do the statusCallback for the above URL for the events below
-            statusCallbackEvent: ["ringing", "answered", "completed"]
-          })
-          .then(call => {
-            console.debug("\tcall created: ", call.sid);
-            console.debug("\t\tto:\t", call.to);
-            console.debug("\t\tfrom:\t", call.from);
-            console.debug("\t\tstatus:\t", call.status.toString());
+// store websocketServer so it can be referenced in http server
+app.set("outboundDialingWSS", outboundDialingWSS);
 
-            var response = JSON.stringify({
-              messageType: "callUpdate",
-              callSid: call.sid,
-              callStatus: call.status.toString()
-            });
+//store these references so they can be access in routes
+app.set("callWebSocketMapping", callWebSocketMapping);
+app.set("twilioClient", twilioClient);
 
-            callWebSocketMapping.set(call.sid, webSocketClient);
-
-            //send call ID and status back to originating client
-            webSocketClient.send(response);
-          })
-          .catch(error => {
-            console.error("\tcall creation failed");
-            console.error("\tERROR: ", error);
-            webSocketClient.send(
-              JSON.stringify({ messageType: "error", message: error.message })
-            );
-          });
-      } else if (data.method === "hangup" && data.callSid) {
-        twilioClient
-          .calls(data.callSid)
-          .update({ status: "completed" })
-          .then(call => {
-            console.debug("\tcall terminated: ", call.sid);
-            console.debug("\t\tto:\t", call.to);
-            console.debug("\t\tfrom:\t", call.from);
-            console.debug("\t\tstatus:\t", call.status.toString());
-          })
-          .catch(error => {
-            console.error("\tcall failed to terminate: ", data.callSid);
-            console.error("\tERROR: ", error);
-            webSocketClient.send(
-              JSON.stringify({ messageType: "error", message: error.message })
-            );
-          });
-      } else {
-        var response = "Unrecognized payload: " + data;
-        console.warn(response);
-        webSocketClient.send(response);
-      }
-    } catch (e) {
-      // if not an object, echo back to originating client
-      webSocketClient.send("echo: " + data);
-    }
-  });
-});
-
-// setup keep alive timeout of 30 seconds
-setInterval(function ping() {
-  console.debug("heartbeat clients: ", wss.clients.size);
-  wss.clients.forEach(function each(webSocketClient) {
-    if (webSocketClient.isAlive === false) {
-      console.warn(
-        "Possible network issue: webSocketClient timed out after 30 seconds, terminating"
-      );
-      // remove timed out client from map redundent as call complete event will clear it however this should be added later for a long running production system wherever its possible over time a callback may fail to connect due to network issues or some other unforseen variable
-      return webSocketClient.terminate();
-    }
-
-    webSocketClient.isAlive = false;
-    webSocketClient.ping(tools.noop);
-  });
-}, 30000);
+console.info("AccountSid: " + process.env.TWILIO_ACCOUNT_SID);
+console.info(
+  "Auth Token: " + process.env.TWILIO_AUTH_TOKEN.slice(0, 5) + "..."
+);
+console.info(
+  "Outbound Calling Workflow Sid: " + process.env.TWILIO_OUTBOUND_WORKFLOW_SID
+);
+console.info("Backend: " + process.env.EXTERNAL_HOST);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -176,4 +99,4 @@ app.use(function(err, req, res, next) {
   res.render("error");
 });
 
-module.exports = { app, wss };
+module.exports = { app, outboundDialingWSS };
