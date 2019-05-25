@@ -1,6 +1,9 @@
-# outbound-dialing-backend
+# twilio-flex-sample-backend
 
-This project is a demo backend service that compliments the front end outbound dialpad solution [here](https://github.com/jhunter-twilio/plugin-flex-outbound-dialpad)
+This project is a demo backend service that supports various sample front end plugins to twilio flex
+
+# Services
+**To support [outbound dialing with conference](https://github.com/jhunter-twilio/plugin-flex-outbound-dialpad)**
 
 It exposes a websocket that can be used to:
   - trigger a call from a client
@@ -29,29 +32,31 @@ You can now setup the server, you can either deploy to heroku (which is free, yo
 
 # Deploying to heroku
 
-1. Use this link to begin [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/jhunter-twilio/outbound-dialing-backend/tree/master)
+1. Use this link to begin [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/jhunter-twilio/twilio-flex-sample-backend/tree/master)
 
 2. Populate the given variables when prompted
     - TWILIO_OUTBOUND_WORKFLOW_SID - the SID of the workflow you just created - used for creating tasks
     - TWILIO_ACCOUNT_SID - the account sid of your twilio account - used for calling Twilio APIs
     - TWILIO_AUTH_TOKEN - the auth token of your twilio account - used for calling Twilio APIs
-    - EXTERNAL_HOST - the host that exposes this service - used for telling Twilio where to make callbacks when calling the Twilio APIs.  Should be of the form https://<HEROKU_APP_NAME>.herokuapp.com
+    - EXTERNAL_HOST - the host that exposes this service - used for telling Twilio where to make callbacks when calling the Twilio APIs.  Should be of the form <HEROKU_APP_NAME>.herokuapp.com
     
-3. You're all set, the backend is ready.  You can access it on https://<HEROKU_APP_NAME>.herokuapp.com and you can create a websocket on wss://<HEROKU_APP_NAME>.herokuapp.com/websocket 
+3. You're all set, the backend is ready.  You can access it on https://<HEROKU_APP_NAME>.herokuapp.com and you can create a websocket on wss://<HEROKU_APP_NAME>.herokuapp.com/outboundDialWebsocket 
   - https://www.websocket.org/echo.html is an excellent web page for testing the websocket is exposed correctly.
   
 # Deploying locally
 
 1. Clone repository using git clone 
 2. run ```npm install```
+3. clone the .env.sample
+4. update .env.sample as approproate, descriptions above
 3. run ```ngrok http 3000```
-3. start server using ```TWILIO_OUTBOUND_WORKFLOW_SID=<WORKFLOWSID> TWILIO_ACCOUNT_SID=<ACCOUNTSID> TWILIO_AUTH_TOKEN=<AUTHTOKEN> EXTERNAL_HOST=https://<NGROK-ENDPOINT> DEBUG=outbound-dialing-backend:* npm start```
+3. start server using ```npm start```
 
 # change log
+v1.2 - migrated repository over to "twili-flex-sample-backend" to be used with other plugins other than outbound dial, inroduced dotenv
 v1.1 - updated websocket endpoint to reflect its dedicated to outbound calling
-
 v1.0 - initial release
 
 # TODOs
 
-1. consolidate backend server with other plugin solutions that require event push to client from backend.  (e.g. real time dashboard)
+
