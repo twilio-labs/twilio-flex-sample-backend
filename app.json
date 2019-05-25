@@ -27,7 +27,7 @@
       "required": true
     },
     "EXTERNAL_HOST": {
-      "description": "The hostname in the form \"https://<HEROKU_APP_NAME>.herokuapp.com\" of this service.  Use to tell Twilio where to send call status updates for each call made from this system.",
+      "description": "The hostname in the form \"<HEROKU_APP_NAME>.herokuapp.com\" of this service.  Use to tell Twilio where to send call status updates for each call made from this system.",
       "value": "CHANGEME",
       "required": true
     }
