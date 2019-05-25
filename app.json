@@ -1,5 +1,5 @@
 {
-  "name": "Outbound Dialing Server",
+  "name": "Twilio Flex Sample Backend",
   "description": "An application that serves a websocket connection to facilitate outbound call orchestration.  The websocket allows for posting of updates directly back to the front end client that made the call.",
   "repository": "https://github.com/jhunter-twilio/outbound-dialing-backend.git",
   "logo": "https://node-js-sample.herokuapp.com/node.png",
