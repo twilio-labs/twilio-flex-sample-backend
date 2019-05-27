@@ -5,7 +5,7 @@ This project is a demo backend service that supports various sample front end pl
 # Services
 **To support [outbound dialing with conference](https://github.com/jhunter-twilio/plugin-flex-outbound-dialpad)**
 
-It exposes a websocket that can be used to:
+It exposes a secure websocket with authentication that can be used to:
   - trigger a call from a client
   - push updates of the call status back to that client
   - hang up a call for a given client
@@ -40,8 +40,8 @@ You can now setup the server, you can either deploy to heroku (which is free, yo
     - TWILIO_AUTH_TOKEN - the auth token of your twilio account - used for calling Twilio APIs
     - EXTERNAL_HOST - the host that exposes this service - used for telling Twilio where to make callbacks when calling the Twilio APIs.  Should be of the form <HEROKU_APP_NAME>.herokuapp.com
     
-3. You're all set, the backend is ready.  You can access it on https://<HEROKU_APP_NAME>.herokuapp.com and you can create a websocket on wss://<HEROKU_APP_NAME>.herokuapp.com/outboundDialWebsocket 
-  - https://www.websocket.org/echo.html is an excellent web page for testing the websocket is exposed correctly.
+3. You're all set, the backend is ready.  You can access it on https://<HEROKU_APP_NAME>.herokuapp.com
+
   
 # Deploying locally
 
@@ -53,6 +53,7 @@ You can now setup the server, you can either deploy to heroku (which is free, yo
 3. start server using ```npm start```
 
 # change log
+v1.3 - added authentication provider in for websocket using api token provided by twilio via flex
 v1.2 - migrated repository over to "twili-flex-sample-backend" to be used with other plugins other than outbound dial, inroduced dotenv
 v1.1 - updated websocket endpoint to reflect its dedicated to outbound calling
 v1.0 - initial release
