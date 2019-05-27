@@ -53,9 +53,12 @@ You can now setup the server, you can either deploy to heroku (which is free, yo
 3. start server using ```npm start```
 
 # change log
-v1.3 - added authentication provider in for websocket using api token provided by twilio via flex
-v1.2 - migrated repository over to "twili-flex-sample-backend" to be used with other plugins other than outbound dial, inroduced dotenv
+v1.3 - added authentication provider for websocket using api token provided by twilio via flex
+
+v1.2 - migrated repository over to "twilio-flex-sample-backend" to be used with other plugins other than outbound dial, inroduced dotenv
+
 v1.1 - updated websocket endpoint to reflect its dedicated to outbound calling
+
 v1.0 - initial release
 
 # TODOs
