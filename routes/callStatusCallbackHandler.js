@@ -3,13 +3,10 @@ var express = require("express");
 var router = express.Router();
 
 router.options("/", (req, res, next) => {
-  tools.setCORSHeaders(res);
   res.send();
 });
 
 router.post("/", (req, res, next) => {
-  tools.setCORSHeaders(res);
-
   // callback receive send 200 immediately
   res.send();
 

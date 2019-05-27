@@ -4,12 +4,10 @@ var VoiceResponse = require("twilio").twiml.VoiceResponse;
 var router = express.Router();
 
 router.options("/", (req, res, next) => {
-  tools.setCORSHeaders(res);
   res.send();
 });
 
 router.post("/", (req, res, next) => {
-  tools.setCORSHeaders(res);
   res.setHeader("Content-Type", "application/xml");
 
   console.debug("\tcallhandler for: ", req.body.CallSid);

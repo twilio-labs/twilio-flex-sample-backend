@@ -84,12 +84,14 @@ function makeOutboundCall(twilioClient, data) {
     var callHandlerCallbackURL = encodeURI(
       "https://" +
         process.env.EXTERNAL_HOST +
-        "/callHandlerTwiml?workerContactUri=" +
+        "/twilio-webhook/callHandlerTwiml?workerContactUri=" +
         data.workerContactUri
     );
 
     var statusCallbackURL =
-      "https://" + process.env.EXTERNAL_HOST + "/callStatusCallbackHandler";
+      "https://" +
+      process.env.EXTERNAL_HOST +
+      "/twilio-webhook/callStatusCallbackHandler";
 
     twilioClient.calls
       .create({
@@ -105,7 +107,7 @@ function makeOutboundCall(twilioClient, data) {
       })
       .catch(error => {
         console.error("\tcall creation failed");
-        console.error("\tERROR: ", error);
+        console.error("\tERROR: ", error.message);
         resolve({ success: false, error: error });
       });
   });

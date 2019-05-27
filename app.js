@@ -12,6 +12,7 @@ var callHandlerTwiml = require("./routes/callHandlerTwiml");
 
 // add websocket handlers
 var tools = require("./common/tools");
+var authentication = require("./common/authentication");
 var ws = require("ws");
 
 // init twilio client
@@ -32,14 +33,34 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+//setup authentication up for websocket
+app.use("/websocket", function(req, res, next) {
+  var token = req.header("sec-websocket-protocol")
+    ? req.header("sec-websocket-protocol")
+    : req.header("token");
+
+  authentication
+    .isValid(token)
+    .then(() => {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Access-Control-Allow-Method", "OPTIONS POST GET");
+      res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+      next();
+    })
+    .catch(error => {
+      res.status(403);
+      res.send(createError(403));
+    });
+});
+
 // map traditional routes
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
-app.use("/callStatusCallbackHandler", callStatusCallbackHandler);
-app.use("/callHandlerTwiml", callHandlerTwiml);
+app.use("/twilio-webhook/callStatusCallbackHandler", callStatusCallbackHandler);
+app.use("/twilio-webhook/callHandlerTwiml", callHandlerTwiml);
 
 //map webSocket endpoints to upgrade connecion to websocket
-app.use("/outboundDialWebsocket", function(req, res, next) {
+app.use("/websocket/outboundDial", function(req, res, next) {
   res.websocket(function(webSocketClient) {
     console.debug("New outboundDialWebsocket connection created");
     webSocketClient.send("new connection established");
@@ -53,7 +74,7 @@ app.use("/outboundDialWebsocket", function(req, res, next) {
 
 // init websocket server dedicated to outbound dialing
 var outboundDialingWSS = new ws.Server({ noServer: true });
-var outboundWSSHandler = require("./websockets/outboundDialWebSocket/eventManager");
+var outboundWSSHandler = require("./websockets/outboundDial/eventManager");
 var callWebSocketMapping = new Map();
 
 // setup message echo to originating client
