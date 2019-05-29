@@ -26,6 +26,11 @@
       "value": "CHANGEME",
       "required": true
     },
+    "TWILIO_FLEX_WORKSPACE_SID": {
+      "description": "TaskRouter Flex Assignment Workspace Sid, generated when creating a twilio flex project",
+      "value": "CHANGEME",
+      "required": true
+    },
     "EXTERNAL_HOST": {
       "description": "The hostname in the form \"<HEROKU_APP_NAME>.herokuapp.com\" of this service.  Use to tell Twilio where to send call status updates for each call made from this system.",
       "value": "CHANGEME",
