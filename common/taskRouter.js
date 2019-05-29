@@ -61,7 +61,7 @@ function populateCumulativeStatsForQueueItem(
       .fetch({
         taskChannel: taskChannel ? taskChannel : undefined,
         startDate: todaysDate,
-        splitByWaitTime: "5,15,20"
+        splitByWaitTime: "30,60,120"
       })
       .then(result => {
         taskChannel = !taskChannel ? "all" : taskChannel;
