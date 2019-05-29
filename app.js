@@ -59,14 +59,6 @@ app.use("/users", usersRouter);
 app.use("/twilio-webhook/callStatusCallbackHandler", callStatusCallbackHandler);
 app.use("/twilio-webhook/callHandlerTwiml", callHandlerTwiml);
 
-//map webSocket endpoints to upgrade connecion to websocket
-app.use("/websocket/outboundDial", function(req, res, next) {
-  res.websocket(function(webSocketClient) {
-    console.debug("New outboundDialWebsocket connection created");
-    webSocketClient.send("new connection established");
-  });
-});
-
 /**
  *  Outbound dialing websocket
  *
@@ -88,8 +80,25 @@ outboundDialingWSS.on("connection", webSocketClient =>
 
 tools.setupHeartbeatMonitor("outboundDialingWSS", outboundDialingWSS, 30000);
 
+/**
+ *  Realtime stats websocket
+ *
+ */
+
+var realtimeStatsWSS = new ws.Server({ noServer: true });
+var realtimeStatsWSSHandler = require("./websockets/realtimeStats/eventManager");
+
+// setup message echo to originating client
+realtimeStatsWSS.on("connection", webSocketClient =>
+  realtimeStatsWSSHandler.handleConnection(webSocketClient, twilioClient)
+);
+
+tools.setupHeartbeatMonitor("realtimeStatsWSS", realtimeStatsWSS, 30000);
+tools.setupQueueStatsSchedule(realtimeStatsWSS, 5000, twilioClient);
+
 // store websocketServer so it can be referenced in http server
 app.set("outboundDialingWSS", outboundDialingWSS);
+app.set("realtimeStatsWSS", realtimeStatsWSS);
 
 //store these references so they can be access in routes
 app.set("callWebSocketMapping", callWebSocketMapping);
@@ -120,4 +129,4 @@ app.use(function(err, req, res, next) {
   res.render("error");
 });
 
-module.exports = { app, outboundDialingWSS };
+module.exports = { app, outboundDialingWSS, realtimeStatsWSS };
