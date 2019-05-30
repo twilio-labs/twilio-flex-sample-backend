@@ -16,7 +16,7 @@ router.post("/", (req, res, next) => {
   console.debug("\t\tstatus:\t", req.body.CallStatus);
 
   var callWebSocketMapping = req.app.get("callWebSocketMapping");
-  inboundClient = callWebSocketMapping.get(req.body.CallSid);
+  var inboundClient = callWebSocketMapping.get(req.body.CallSid);
 
   var response = JSON.stringify({
     messageType: "callUpdate",
