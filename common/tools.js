@@ -1,6 +1,6 @@
 taskRouter = require("./taskRouter");
 
-var iterations = 5;
+var iterations = 6;
 
 function setCORSHeaders(res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -31,8 +31,8 @@ function setupHeartbeatMonitor(name, websocketServer, timeout) {
 function setupQueueStatsSchedule(websocketServer, timeout, twilioClient) {
   setInterval(function fetchQueueStats() {
     let startTime = new Date();
-    var withCumulative = iterations < 5 ? false : true;
-    iterations = iterations < 5 ? ++iterations : 0;
+    var withCumulative = iterations < 6 ? false : true;
+    iterations = iterations < 6 ? ++iterations : 0;
     taskRouter
       .fetchAllQueueStatistics(twilioClient, withCumulative)
       .then(queueStats => {

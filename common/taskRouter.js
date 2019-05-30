@@ -202,9 +202,23 @@ function fetchAllQueueStatistics(twilioClient, withCumulative) {
               }
             });
             if (!matched) {
+              // new queue
               queueStats.push(queueResultItem);
             }
           });
+
+          // remove, removed queues by ensuring the preserved queue stats array
+          // queue sids appear in the results returned from the backend
+          var tempArray = [];
+          queueStats.forEach(queueStatsItem => {
+            queueResultsArray.forEach(queueResultItem => {
+              if (queueResultItem.sid === queueStatsItem.sid) {
+                tempArray.push(queueStatsItem);
+              }
+            });
+          });
+
+          queueStats = tempArray;
           resolve(queueStats);
         });
       }
