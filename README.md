@@ -22,10 +22,10 @@ It also exposes two end points that are called by twilio when:
 It exposes a secure websocket with authentication that can be used to:
 
 - recieve updates of stat changes
-    - current queue stats updated every 5 seconds
-    - todays overall stats updated every 30 seconds
-    - turn stats on/off per channel
-    - define your own SLA thresholds (max 3)
+  - current queue stats updated every 5 seconds
+  - todays overall stats updated every 30 seconds
+  - turn stats on/off per channel
+  - define your own SLA thresholds (max 3)
 
 # Dependencies
 
@@ -77,5 +77,9 @@ v1.2 - migrated repository over to "twilio-flex-sample-backend" to be used with 
 v1.1 - updated websocket endpoint to reflect its dedicated to outbound calling
 
 v1.0 - initial release
+
+## Code of Conduct
+
+Please be aware that this project has a [Code of Conduct](https://github.com/twilio-labs/.github/blob/master/CODE_OF_CONDUCT.md). The tldr; is to just be excellent to each other ❤️
 
 # TODOs
