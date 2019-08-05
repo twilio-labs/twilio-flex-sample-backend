@@ -94,7 +94,7 @@ realtimeStatsWSS.on("connection", webSocketClient =>
 );
 
 tools.setupHeartbeatMonitor("realtimeStatsWSS", realtimeStatsWSS, 30000);
-tools.setupQueueStatsSchedule(realtimeStatsWSS, 2000, twilioClient);
+tools.setupQueueStatsSchedule(realtimeStatsWSS, 1000, twilioClient);
 
 // store websocketServer so it can be referenced in http server
 app.set("outboundDialingWSS", outboundDialingWSS);
