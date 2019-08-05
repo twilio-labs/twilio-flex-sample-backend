@@ -1,6 +1,6 @@
 taskRouter = require("./taskRouter");
 
-var iterations = 6;
+var iterations = 1;
 
 function setCORSHeaders(res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
