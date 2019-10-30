@@ -49,17 +49,17 @@ You can now setup the server, you can either deploy to heroku (which is free, yo
 
 2. Populate the given variables when prompted
 
-   - TWILIO_OUTBOUND_WORKFLOW_SID - the SID of the workflow you just created - used for creating tasks
-   - TWILIO_ACCOUNT_SID - the account sid of your twilio account - used for calling Twilio APIs
-   - TWILIO_AUTH_TOKEN - the auth token of your twilio account - used for calling Twilio APIs
-   - TWILIO_FLEX_WORKSPACE_SID - TaskRouter Flex Assignment Workspace Sid, generated when creating a twilio flex project
-   - EXTERNAL_HOST - the host that exposes this service - used for telling Twilio where to make callbacks when calling the Twilio APIs. Should be of the form <HEROKU_APP_NAME>.herokuapp.com
+   - `TWILIO_OUTBOUND_WORKFLOW_SID` - the SID of the workflow you just created - used for creating tasks
+   - `TWILIO_ACCOUNT_SID` - the account sid of your twilio account - used for calling Twilio APIs
+   - `TWILIO_AUTH_TOKEN` - the auth token of your twilio account - used for calling Twilio APIs
+   - `TWILIO_FLEX_WORKSPACE_SID` - TaskRouter Flex Assignment Workspace Sid, generated when creating a twilio flex project
+   - `EXTERNAL_HOST` - the host that exposes this service - used for telling Twilio where to make callbacks when calling the Twilio APIs. Should be of the form <HEROKU_APP_NAME>.herokuapp.com
 
 3. You're all set, the backend is ready. You can access it on https://<HEROKU_APP_NAME>.herokuapp.com
 
 # Deploying locally
 
-1. Clone repository using git clone
+1. Clone repository using `git clone`
 2. run `npm install`
 3. clone the .env.sample to .env
 4. update .env as approproate, descriptions above
