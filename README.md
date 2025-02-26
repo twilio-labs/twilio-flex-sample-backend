@@ -37,8 +37,6 @@ Before setting up this server you must first created a dedicated TaskRouter work
 - make sure the filter matches to a queue with Everyone on it. The default Everyone queue will work but if you want to seperate real time reporting for outbound calls, you should make a dedicated queue for it with a queue expression
   - 1==1
 
-![alt text](https://raw.githubusercontent.com/jhunter-twilio/outbound-dialing-backend/master/screenshots/workflow-config.png)
-
 # Setup
 
 You can now setup the server, you can either deploy to heroku (which is free, you just need a login) or you can setup locally and expose via ngrok
